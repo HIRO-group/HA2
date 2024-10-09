@@ -60,14 +60,16 @@ class OAIAgent(nn.Module, ABC):
         https://stable-baselines3.readthedocs.io/en/master/modules/base.html#stable_baselines3.common.base_class.BaseAlgorithm.predict
         """
 
-    def set_idx(self, p_idx, layout_name, is_hrl=False, output_message=True, tune_subtasks=False):
+    def set_idx(self, p_idx, env, is_hrl=False, output_message=True, tune_subtasks=False):
         self.p_idx = p_idx
-        self.layout_name = layout_name
+        self.layout_name = env.layout_name
+        self.obs_closure_fn = env.get_obs
         self.prev_state = None
-        self.stack_frames = self.policy.observation_space['visual_obs'].shape[0] == (26 * self.args.num_stack)
+        self.stack_frames = self.policy.observation_space['visual_obs'].shape[0] == (27 * self.args.num_stack)
         self.stackedobs = StackedObservations(1, self.args.num_stack, self.policy.observation_space['visual_obs'], 'first')
         if is_hrl:
             self.set_play_params(output_message, tune_subtasks)
+        self.valid_counters = env.valid_counters
 
     def set_encoding_params(self, mdp, horizon):
         self.mdp = mdp
@@ -88,38 +90,9 @@ class OAIAgent(nn.Module, ABC):
             else:
                 obs['visual_obs'], _ = self.stackedobs.update(obs['visual_obs'], np.array([False]), [{}])
             obs['visual_obs'] = obs['visual_obs'].squeeze()
-        if 'player_completed_subtasks' in self.policy.observation_space.keys():
-            # If this isn't the first step of the game, see if a subtask has been completed
-            comp_st = [None, None]
-            if self.prev_state is not None:
-                for i in range(2):
-                    try:
-                        cst = calculate_completed_subtask(self.terrain, self.prev_state, state, i)
-                    except ValueError as e:
-                        # print('???', e, flush=True)
-                        cst = None
-                    comp_st[i] = cst
-                # If a subtask has been completed, update counts
-                if comp_st[self.p_idx] is not None:
-                    player_completed_tasks = np.eye(Subtasks.NUM_SUBTASKS)[comp_st[self.p_idx]]
-                    self.prev_subtask = comp_st[self.p_idx]
-                else:
-                    player_completed_tasks = np.zeros(Subtasks.NUM_SUBTASKS)
-                    # print(f'Agent completed: {comp_st[self.p_idx]}')
-                if comp_st[1 - self.p_idx] is not None:
-                    tm_completed_tasks = np.eye(Subtasks.NUM_SUBTASKS)[comp_st[1 - self.p_idx]]
-                else:
-                    tm_completed_tasks = np.zeros(Subtasks.NUM_SUBTASKS)
-                    # print(f'Teammate completed: {comp_st[1 - self.p_idx]}')
-                # If this is the first step of the game, reset subtask counts to 0
-            else:
-                player_completed_tasks = np.zeros(Subtasks.NUM_SUBTASKS)
-                tm_completed_tasks = np.zeros(Subtasks.NUM_SUBTASKS)
-            obs['player_completed_subtasks'] = player_completed_tasks
-            obs['teammate_completed_subtasks'] = tm_completed_tasks
+
         if 'subtask_mask' in self.policy.observation_space.keys():
-            obs['subtask_mask'] = get_doable_subtasks(state, self.prev_subtask, self.layout_name, self.terrain, self.p_idx, USEABLE_COUNTERS[self.layout_name]).astype(bool)
-            # print(f'DOABLE SUBTASKS: {[Subtasks.IDS_TO_SUBTASKS[i] for i in obs["subtask_mask"]]}', flush=True)
+            obs['subtask_mask'] = get_doable_subtasks(state, self.prev_subtask, self.layout_name, self.terrain, self.p_idx, self.valid_counters, USEABLE_COUNTERS.get(self.layout_name, 5)).astype(bool)
 
         self.prev_state = deepcopy(state)
         obs = {k: v for k, v in obs.items() if k in self.policy.observation_space.keys()}
@@ -127,7 +100,6 @@ class OAIAgent(nn.Module, ABC):
         try:
             agent_msg = self.get_agent_output()
         except AttributeError as e:
-            # print(e, flush=True)
             agent_msg = ' '
 
         action, _ = self.predict(obs, deterministic=deterministic)
@@ -189,7 +161,7 @@ class SB3Wrapper(OAIAgent):
         obs, vectorized_env = self.policy.obs_to_tensor(obs)
         with th.no_grad():
             if 'subtask_mask' in obs and np.prod(obs['subtask_mask'].shape) == np.prod(self.agent.action_space.n):
-                dist = self.policy.get_distribution(obs, obs['subtask_mask'])
+                dist = self.policy.get_distribution(obs, action_masks=obs['subtask_mask'])
             else:
                 dist = self.policy.get_distribution(obs)
 
@@ -206,7 +178,7 @@ class SB3Wrapper(OAIAgent):
         obs, vectorized_env = self.policy.obs_to_tensor(obs)
         with th.no_grad():
             if 'subtask_mask' in obs and np.prod(obs['subtask_mask'].shape) == np.prod(self.policy.action_space.n):
-                dist = self.policy.get_distribution(obs, obs['subtask_mask'])
+                dist = self.policy.get_distribution(obs, action_masks=obs['subtask_mask'])
             else:
                 dist = self.policy.get_distribution(obs)
         return dist
@@ -294,7 +266,7 @@ class PolicyClone(OAIAgent):
         obs, vectorized_env = self.policy.obs_to_tensor(obs)
         with th.no_grad():
             if 'subtask_mask' in obs and np.prod(obs['subtask_mask'].shape) == np.prod(self.policy.action_space.n):
-                dist = self.policy.get_distribution(obs, obs['subtask_mask'])
+                dist = self.policy.get_distribution(obs, action_masks=obs['subtask_mask'])
             else:
                 dist = self.policy.get_distribution(obs)
 
@@ -311,7 +283,7 @@ class PolicyClone(OAIAgent):
         obs, vectorized_env = self.policy.obs_to_tensor(obs)
         with th.no_grad():
             if 'subtask_mask' in obs and np.prod(obs['subtask_mask'].shape) == np.prod(self.policy.action_space.n):
-                dist = self.policy.get_distribution(obs, obs['subtask_mask'])
+                dist = self.policy.get_distribution(obs, action_masks=obs['subtask_mask'])
             else:
                 dist = self.policy.get_distribution(obs)
         return dist
@@ -433,20 +405,20 @@ class OAITrainer(ABC):
         th.save(save_dict, save_path)
         return path, tag
 
-    def load_agents(self, path: Union[Path, None] = None, tag: Union[str, None] = None):
+    @staticmethod
+    def load_agents(args, name: str=None, path: Union[Path, None] = None, tag: Union[str, None] = None):
         ''' Loads each agent that the trainer is training '''
-        path = path or self.args.base_dir / 'agent_models' / self.name
-        tag = tag or self.args.exp_name
+        path = path or args.base_dir / 'agent_models' / name
+        tag = tag or args.exp_name
         load_path = path / tag / 'trainer_file'
         agent_path = path / tag / 'agents_dir'
-        device = self.args.device
+        device = args.device
         saved_variables = th.load(load_path, map_location=device)
 
         # Load weights
         agents = []
         for agent_fn in saved_variables['agent_fns']:
-            agent = load_agent(agent_path / agent_fn, self.args)
+            agent = load_agent(agent_path / agent_fn, args)
             agent.to(device)
             agents.append(agent)
-        self.agents = agents
-        return self.agents
+        return agents

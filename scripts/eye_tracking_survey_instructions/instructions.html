@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://unpkg.com/survey-core@1.9.51/defaultV2.min.css" type="text/css" rel="stylesheet"/>
+    <style>
+      html *
+      {
+         color: #000 !important;
+         font-family: Sans Serif !important;
+      }
+
+      img.center {
+        display: block;
+        margin: 0 auto;
+      }
+      table, td, th {
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th, td {
+        padding: 15px;
+      }
+      tr:nth-child(even) {background-color: #f2f2f2;}
+      
+      .header-text {
+        font-size: 28pt;
+        margin: 10px 20px;
+        padding: 10px 20px;
+        text-align: center;
+      }
+
+      .normal-text {
+        font-size: 20pt;
+        margin: 0x 40px;
+        padding: 5px 40px;
+        text-align: left;
+      }
+    </style>
+
+    <title>Instructions</title>
+    <link rel="Favicon" href="static/favicon.ico" />
+
+    <script src="static/lib/jquery-min.js" type="text/javascript"> </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="container" style="padding-top: 30px margin-left: 100px margin-right: 100px">
+      <h2 class="header-text">Instructions</h2>
+      <p class="normal-text">
+          Hello! In this task, you will be co-playing a
+          cooking game with an AI agent. 
+          
+          Your goal will be to serve as many onion soups 
+          as possible before the end of each trial.
+
+          You will be awarded 20 points for each soup served.
+      </p>
+
+      <br>
+      <hr>
+      <br>
+
+      <h3 class="header-text">Layouts</h3>
+      <p class="normal-text">
+        Each trial will have a different environment, but will look similar to this:
+      </p>
+      <img class="center" src="images/training0.png" style="width:600px">
+      <p class="normal-text">
+        <br>
+        You will interact with objects in the environment to make onion soup recipes. 
+        A labeled version of the environment is shown below:
+      </p>
+      <img class="center" src="images/training0-annotated.png" style="width:800px">
+
+      <br>
+      <hr>
+      <br>
+
+      <h3 class="header-text">Movement and Interactions</h3>
+      <img class="center" src="images/space-arrows.png" style="width:250px">
+      <p class="normal-text">
+        You can move (up, down, left, and right) using
+        the <b>arrow keys</b>, and interact with objects
+        using the <b>spacebar</b>.
+      </p>
+      <p class="normal-text">
+        You can interact with objects by facing them and pressing
+        <b>spacebar</b>. Here are some examples:
+        <ul class="normal-text" style="margin-left: 8%;">
+          <li>You can pick up onions by facing an onion dispenser or an onion on
+            a counter and pressing <b>spacebar</b>.</li>
+          <li>If you are holding an onion and are facing an empty counter,
+            and press <b>spacebar</b>, you will put the onion on the counter.</li>
+          <li>If you are holding an onion and are facing a pot that is not full,
+            and press <b>spacebar</b>, you will put the onion in the pot.</li>
+        </ul>
+      </p>
+
+      <br>
+      <p class="normal-text">
+        Note that as you and your AI partner are moving around the kitchen
+        you <u><b>cannot occupy the same location</b></u>.
+      </p>
+      <br>
+      <hr>
+      <br>
+
+      <h3 class="header-text">Cooking</h3>
+      <img class="center" src="images/soup.png" style="width:250px">
+      <p class="normal-text">
+        You will need to gather onions and put them in a pot.
+        The soup will automatically start cooking once 3 onions are in the pot. 
+      </p>
+      <p class="normal-text">
+          When a soup begins cooking, you'll notice a red number appear over the pot to
+          denote the cook time. This number counts upward until the soup is done. Soups
+          take 20 timesteps, or 4 seconds, to cook.
+
+          Once the soup is cooked, you must grab a dish, put the soup in the dish, 
+          and then place the soup in the serving area.
+      </p>
+      <p class="normal-text">
+          Each soup is worth 20 points.
+
+          After each trial, a brief survey will appear asking about your interactions
+          with your AI teammate. Please answer these questions based on the interaction
+          you just had. You will perform 18 total trials and each trial lasts
+          around 80 seconds or 400 timesteps.
+      </p>
+
+      <br>
+      <hr>
+      <br>
+
+      <h3 class="header-text">Prior to Starting Each Trial</h3>
+      <p class="normal-text">
+        Before beginning a new trial remember:
+          (1) Verify your eyes are aligned up the eye tracking bar at the bottom of the computer screen,
+          (2) Try to maintain a consisten distance from the computer screen, and
+          (3) During the task  you can take a break by delaying the start to the next trial.
+      </p>
+      <div align="center" style="margin: auto">
+        <form align="center" style="text-align: center margin: auto width:600px">
+          <input type="submit" value="Start Tutorial" class="header-text">
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

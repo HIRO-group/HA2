@@ -1,16 +1,17 @@
 # Hierarchical Ad Hoc Agents (HAHA)
 Code for [Hierarchical Reinforcement Learning for Ad Hoc Teaming](https://www.southampton.ac.uk/~eg/AAMAS2023/pdfs/p2337.pdf). Used to train a variety of agents for the overcooked domain.  
-For the most up-to-date version of this repository, please see: https://github.com/StephAO/HAHA
 
 ## Set up guide
 1. Create conda environment:`conda create -n oai python=3.9`
 2. Activate env: `conda activate oai`
-3. Install [pytorch](https://pytorch.org/get-started/locally/) based on your use case 
-4. Install overcooked-ai: `pip install git+https://github.com/StephAO/overcooked_ai.git`  
+3. Install [pytorch](https://pytorch.org/get-started/locally/) based on your use case
+4. Run `pip install setuptools==65.5.0 pip==21`because gym 0.21 installation is broken with more recent versions
+5. If using windows, run: `pip install pygetwindow`
+6. Install overcooked-ai: `pip install git+https://github.com/StephAO/overcooked_ai.git`  
 ***Note***: The above repo is a modified version of the original [overcooked ai repo](https://github.com/HumanCompatibleAI/overcooked_ai)
-5. Clone modified overcooked-ai repo: `git clone https://github.com/StephAO/HAHA.git'   
-6. Move to repo dir: `cd HAHA`
-7. Install this package: `pip install -e .`
+7. Clone modified overcooked-ai repo: `git clone https://github.com/StephAO/HAHA.git'   
+8. Move to repo dir: `cd HAHA`
+9. Install this package: `pip install -e .`
 
 ## General Structure
 - `oai_agents`: Main directory

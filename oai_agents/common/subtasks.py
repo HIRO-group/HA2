@@ -18,6 +18,10 @@ class Subtasks:
     BASE_STS = ['get_onion_from_dispenser', 'put_onion_in_pot', 'get_plate_from_dish_rack', 'get_soup', 'serve_soup']
     SUPP_STS = ['put_onion_closer']#, 'get_soup_from_counter']#, 'put_plate_closer', 'put_soup_closer'] # 3, 6, 9
     COMP_STS = ['get_onion_from_counter']#'get_onion_from_counter', 'get_plate_from_counter']#, 'get_soup_from_counter'] # 1, 5, 8
+    IDS_TO_GOAL_MARKERS = {
+        0: 'onion_dispenser', 1: 'onion', 2: 'empty_pot', 3: 'counter', 4: 'dish_dispenser', 5: 'dish',
+        6: 'counter', 7: 'full_pot', 8: 'soup', 9: 'counter', 10: 'serving_station', 11: 'nothing',
+    }
 
 
 def facing(layout, player):
@@ -39,7 +43,6 @@ def calculate_completed_subtask(layout, prev_state, curr_state, p_idx):
     prev_obj = prev_state.players[p_idx].held_object.name if prev_state.players[p_idx].held_object else None
     curr_obj = curr_state.players[p_idx].held_object.name if curr_state.players[p_idx].held_object else None
     tile_in_front = facing(layout, prev_state.players[p_idx])
-    #print('CCS',prev_obj, curr_obj, tile_in_front)
     # Object held didn't change -- This interaction didn't actually transition to a new subtask
     if prev_obj == curr_obj:
         subtask = None
@@ -115,7 +118,7 @@ def calculate_completed_subtask(layout, prev_state, curr_state, p_idx):
 def non_full_pot_exists(state, terrain, layout_name):
     """
     Returns true if there is currently an empty soup
-    NOTE: Assumes there are 2 pots
+    NOTE: Assumes there are 2 pots for all layouts except cramped_room
     """
     n_full_soups = 0
     for obj in state.objects.values():
@@ -125,7 +128,7 @@ def non_full_pot_exists(state, terrain, layout_name):
     tot_pots = 1 if layout_name == 'cramped_room' else 2
     return n_full_soups < tot_pots
 
-def get_doable_subtasks(state, prev_subtask, layout_name, terrain, p_idx, n_counters):
+def get_doable_subtasks(state, prev_subtask, layout_name, terrain, p_idx, valid_counters, n_counters):
     '''
     Returns a mask subtasks that could be accomplished for a given state and player idx
     :param state: curr state
@@ -149,16 +152,13 @@ def get_doable_subtasks(state, prev_subtask, layout_name, terrain, p_idx, n_coun
             subtask_mask[Subtasks.SUBTASKS_TO_IDS['get_plate_from_dish_rack']] = 1
 
         # The following subtasks are only possible on some configurations for some players (this filters useless tasks)
-        #if layout_name != 'asymmetric_advantages':
         # These are only possible if the respective objects exist on a counter somewhere
         for obj in loose_objects:
-            if layout_name == 'forced_coordination' and obj.position not in [(2, 1), (2, 2), (2, 3)]: # Only valid counter tops in forced coord
-                continue
-            if obj.name == 'onion' and prev_subtask != 'put_onion_closer':
+            if obj.name == 'onion' and prev_subtask != 'put_onion_closer' and obj.position in valid_counters[p_idx]:
                 subtask_mask[Subtasks.SUBTASKS_TO_IDS['get_onion_from_counter']] = 1
-            elif obj.name == 'dish' and prev_subtask != 'put_plate_closer':
+            elif obj.name == 'dish' and prev_subtask != 'put_plate_closer' and obj.position in valid_counters[p_idx]:
                 subtask_mask[Subtasks.SUBTASKS_TO_IDS['get_plate_from_counter']] = 1
-            elif obj.name == 'soup' and prev_subtask != 'put_soup_closer':
+            elif obj.name == 'soup' and prev_subtask != 'put_soup_closer' and obj.position in valid_counters[p_idx]:
                 subtask_mask[Subtasks.SUBTASKS_TO_IDS['get_soup_from_counter']] = 1
     # The player is holding an onion, so it can only accomplish tasks that involve putting the onion somewhere
     elif state.players[p_idx].held_object.name == 'onion':
@@ -187,13 +187,10 @@ def get_doable_subtasks(state, prev_subtask, layout_name, terrain, p_idx, n_coun
             subtask_mask[Subtasks.SUBTASKS_TO_IDS['serve_soup']] = 1
         # There must be an empty counter to put something down
         if len(loose_objects) < n_counters:
-            # if layout_name != 'asymmetric_advantages':
-            # NOTE: not useful on current layouts
-            subtask_mask[Subtasks.SUBTASKS_TO_IDS['put_soup_closer']] = 0
+            subtask_mask[Subtasks.SUBTASKS_TO_IDS['put_soup_closer']] = 1
 
-    # If no other subtask is possible, then set subtask to unknown
-    #if np.sum(subtask_mask) == 0:
     # Becomes a stay action for 1 turn
-    subtask_mask[Subtasks.SUBTASKS_TO_IDS['unknown']] = 1
+    if np.sum(subtask_mask[:-1]) == 0:
+        subtask_mask[Subtasks.SUBTASKS_TO_IDS['unknown']] = 1
 
     return subtask_mask
