@@ -1,5 +1,7 @@
 # Hierarchical Ad Hoc Agents (HAHA)
-Code for [Hierarchical Reinforcement Learning for Ad Hoc Teaming](https://www.southampton.ac.uk/~eg/AAMAS2023/pdfs/p2337.pdf). Used to train a variety of agents for the overcooked domain.  
+Code for [Hierarchical Reinforcement Learning for Ad Hoc Teaming](https://www.southampton.ac.uk/~eg/AAMAS2023/pdfs/p2337.pdf) and [Eyes on the Game: Deciphering Implicit Human Signals to Infer Human Proficiency, Trust, and Intent](https://arxiv.org/abs/2407.03298) Used to train a variety of agents for the overcooked domain and analyse their behavior through the lens of game play data and eye tracking data.  
+
+Raw eye tracking and game play data can be found [here](https://o365coloradoedu.sharepoint.com/:f:/s/CS-HAI_Teaming_EyeGaze_Data/Eu2SJvmDzLlLvfAeNslGpwsBW0ytrFo9NYiZKQqt8jLGOQ?e=6PGD3B)
 
 ## Set up guide
 1. Create conda environment:`conda create -n oai python=3.9`
@@ -32,6 +34,7 @@ Code for [Hierarchical Reinforcement Learning for Ad Hoc Teaming](https://www.so
   - `/colosseum.py`: Have agents play with other agents for evaluation
   - `/run_overcooked_game.py`: Visualize agent-agent or human-agent team playing with each other
   - `/train_agents.py`: Functions to train different kinds of agents
+- `eye_tracking_dataset_operations`: Scripts to process raw xdf files and likert scale files into useable datasets.
 
 ## Training agents
 Refer to scripts/train_agents.py for examples on how to train different agent trainings.
@@ -41,19 +44,31 @@ If you've installed the package as above, you can run the script using:
 ## Citation
 If you use this repository in any way, please cite:  
 ```
-{@inproceedings{10.5555/3545946.3598926,
-author = {Aroca-Ouellette, St\'{e}phane and Aroca-Ouellette, Miguel and Biswas, Upasana and Kann, Katharina and Roncone, Alessandro},
-title = {Hierarchical Reinforcement Learning for Ad Hoc Teaming},
-year = {2023},
-isbn = {9781450394321},
-publisher = {International Foundation for Autonomous Agents and Multiagent Systems},
-address = {Richland, SC},
-abstract = {When performing collaborative tasks with new unknown teammates, humans are particularly adept at adapting to their collaborator and converging toward an aligned strategy. However, state of the art autonomous agents still do not have this capability. We propose that a critical reason for this disconnect is that there is an inherent hierarchical structure to human behavior that current agents lack. In this paper, we explore the use of hierarchical reinforcement learning to train an agent that can navigate the complexities of ad hoc teaming at the same level of abstraction as humans. Our results demonstrate that when paired with humans, our Hierarchical Ad Hoc Agent (HAHA) outperforms all baselines on both the team's objective performance and the human's perception of the agent.},
-booktitle = {Proceedings of the 2023 International Conference on Autonomous Agents and Multiagent Systems},
-pages = {2337–2339},
-numpages = {3},
-keywords = {ad hoc teaming, hierarchical reinforcement learning, human agent collaboration, mutual adaptation, zero-shot coordination},
-location = {London, United Kingdom},
-series = {AAMAS '23}
+@inproceedings{10.5555/3545946.3598926,
+               author = {Aroca-Ouellette, St\'{e}phane and Aroca-Ouellette, Miguel and Biswas, Upasana and Kann, Katharina and Roncone, Alessandro},
+               title = {Hierarchical Reinforcement Learning for Ad Hoc Teaming},
+               year = {2023},
+               isbn = {9781450394321},
+               publisher = {International Foundation for Autonomous Agents and Multiagent Systems},
+               address = {Richland, SC},
+               abstract = {When performing collaborative tasks with new unknown teammates, humans are particularly adept at adapting to their collaborator and converging toward an aligned strategy. However, state of the art autonomous agents still do not have this capability. We propose that a critical reason for this disconnect is that there is an inherent hierarchical structure to human behavior that current agents lack. In this paper, we explore the use of hierarchical reinforcement learning to train an agent that can navigate the complexities of ad hoc teaming at the same level of abstraction as humans. Our results demonstrate that when paired with humans, our Hierarchical Ad Hoc Agent (HAHA) outperforms all baselines on both the team's objective performance and the human's perception of the agent.},
+               booktitle = {Proceedings of the 2023 International Conference on Autonomous Agents and Multiagent Systems},
+               pages = {2337–2339},
+               numpages = {3},
+               keywords = {ad hoc teaming, hierarchical reinforcement learning, human agent collaboration, mutual adaptation, zero-shot coordination},
+               location = {London, United Kingdom},
+               series = {AAMAS '23}
+}
+```
+and
+```
+@misc{hulle2024eyesgamedecipheringimplicit,
+      title={Eyes on the Game: Deciphering Implicit Human Signals to Infer Human Proficiency, Trust, and Intent}, 
+      author={Nikhil Hulle and Stéphane Aroca-Ouellette and Anthony J. Ries and Jake Brawer and Katharina von der Wense and Alessandro Roncone},
+      year={2024},
+      eprint={2407.03298},
+      archivePrefix={arXiv},
+      primaryClass={cs.HC},
+      url={https://arxiv.org/abs/2407.03298}, 
 }
 ```
