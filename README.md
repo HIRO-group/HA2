@@ -9,7 +9,7 @@ For the most up-to-date version of this repository, please see: https://github.c
 4. Install overcooked-ai: `pip install git+https://github.com/StephAO/overcooked_ai.git`  
 ***Note***: The above repo is a modified version of the original [overcooked ai repo](https://github.com/HumanCompatibleAI/overcooked_ai)
 5. Clone modified overcooked-ai repo: `git clone https://github.com/HIRO-group/HA2.git'   
-6. Move to repo dir: `cd HAHA`
+6. Move to repo dir: `cd HA2`
 7. Install this package: `pip install -e .`
 
 ## General Structure
