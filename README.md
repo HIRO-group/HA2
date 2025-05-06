@@ -1,4 +1,4 @@
-# Hierarchical Ad Hoc Agents (HAHA)
+# Hierarchical Ad Hoc Agents (HA2)
 Code for [Hierarchical Reinforcement Learning for Ad Hoc Teaming](https://www.southampton.ac.uk/~eg/AAMAS2023/pdfs/p2337.pdf). Used to train a variety of agents for the overcooked domain.  
 For the most up-to-date version of this repository, please see: https://github.com/StephAO/HAHA
 
@@ -8,7 +8,7 @@ For the most up-to-date version of this repository, please see: https://github.c
 3. Install [pytorch](https://pytorch.org/get-started/locally/) based on your use case 
 4. Install overcooked-ai: `pip install git+https://github.com/StephAO/overcooked_ai.git`  
 ***Note***: The above repo is a modified version of the original [overcooked ai repo](https://github.com/HumanCompatibleAI/overcooked_ai)
-5. Clone modified overcooked-ai repo: `git clone https://github.com/StephAO/HAHA.git'   
+5. Clone modified overcooked-ai repo: `git clone https://github.com/HIRO-group/HA2.git'   
 6. Move to repo dir: `cd HAHA`
 7. Install this package: `pip install -e .`
 
